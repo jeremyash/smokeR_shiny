@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+# directories
+gis/
+kml/
+kml_backup/
+outlooks/
+pc_hy_test
+# files
+test_pb.kmz
+test_pb_piedmont.gif
+testing_again.html
+smoke_template_shiny_old.Rmd
+smoke_template_shiny_static_map.Rmd
