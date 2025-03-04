@@ -750,16 +750,17 @@ pop_pal_fun <- colorFactor(palette = "magma",
 avg_leaflet <- leaflet() %>% 
   addTiles() %>% 
   
-  # addProviderTiles("OpenStreetMap",
-  #                  group = "Street") %>%
-  # addProviderTiles("OpenTopoMap", #"Esri.WorldImagery",
-  #                   group = "Terrain") %>%
-  # 
-  # # add mappanes to always keep circles, then smoke on top
-  addMapPane("pop_map", zIndex = 410) %>%
-  # addMapPane("svi_map", zIndex = 410) %>%
-  addMapPane("smoke_map", zIndex = 420) %>%
-  addMapPane("cir_map", zIndex = 430) %>%
+  addProviderTiles("OpenStreetMap",
+                   group = "Street") %>% 
+  addProviderTiles("Esri.WorldImagery",
+                    group = "Terrain") %>% 
+  
+  
+  # add mappanes to always keep circles, then smoke on top
+  addMapPane("pop_map", zIndex = 450) %>%
+  # # addMapPane("svi_map", zIndex = 410) %>%
+  addMapPane("smoke_map", zIndex = 460) %>%
+  addMapPane("cir_map", zIndex = 470) %>%
   
   #daily average smoke conditions
   addRasterImage(day_one_avg_ras,
@@ -780,25 +781,25 @@ avg_leaflet <- leaflet() %>%
  addMarkers(data = burn_loc, lng = ~lon, lat = ~lat,
              icon = list(
                iconUrl = "redFlame.png",
-               iconSize = c(25, 35))) %>% 
-  
+               iconSize = c(25, 35))) %>%
+
   # circular buffers around fire
   addCircles(data = burn_loc, lng = ~lon, lat = ~lat,
              radius = c(402.336, 804.672, 1609.34, 3218.69, 8046.72, 16093.4, 32186.8),
              color = viridis::viridis(7),
              weight = 5,
-             opacity = 0.8, 
+             opacity = 0.8,
              fill = FALSE,
              group = "Distance from Fire",
-           options=gridOptions(pane="cir_map")) %>% 
-  
+           options=gridOptions(pane="cir_map")) %>%
+
   addLegend(values = c(402.336, 804.672, 1609.34, 3218.69, 8046.72, 16093.4, 32186.8),
            colors = viridis::viridis(7),
            labels = c(0.25, 0.5, 1, 2, 5, 10, 20),
             opacity = 0.75,
            position = "bottomleft",
            title = "Distance from Fire (miles)",
-           group = "Distance from Fire") %>% 
+           group = "Distance from Fire") %>%
 
   # SVI data
   # addRasterImage(svi_buf,
@@ -828,7 +829,7 @@ avg_leaflet <- leaflet() %>%
             opacity = 0.75,
            position = "bottomleft",
            title = "Population",
-           group = "Population") %>% 
+           group = "Population") %>%
 
   # set scale of map viewer
   fitBounds(lng1 = burn_icon$x - 0.5,
@@ -839,18 +840,17 @@ avg_leaflet <- leaflet() %>%
   # scale bar
   addScaleBar(position = "bottomright") %>% 
   
-  # basemap toggle
-  # addLayersControl(baseGroups = c("Street", "Terrain"),
-  #                  position = "topright") %>% 
-  
+
   # add layer control to map
   addLayersControl(
     # overlayGroups = c("Smoke", "Population", "Social Vulnerability Index"),
     overlayGroups = c("Smoke", "Distance from Fire", "Population"),
-    options = layersControlOptions(collapsed = FALSE)) %>% 
-  hideGroup("Population") %>% 
+    baseGroups = c("Street", "Terrain"),
+    options = layersControlOptions(zIndex = 490,
+                                   collapsed = FALSE)) %>%
+  hideGroup("Population") %>%
   hideGroup("Distance from Fire") 
-  # hideGroup("Social Vulnerability Index") 
+# hideGroup("Social Vulnerability Index")
 
 
 
