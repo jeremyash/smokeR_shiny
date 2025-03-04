@@ -14,7 +14,7 @@ params:
   AUTHOR: "Test"
   EMAIL: "Test"
   PHONE: "Test"
-  RUN_ID: "167c32ba59dc07"
+  RUN_ID: "167c62c71d91b9"
   DROP_LOW_AVG: "No"
   FORECAST_AQI_SELECT: "Good"
   SUPERFOG_SCREEN_SELECT: "No"
@@ -113,13 +113,29 @@ results_output_link <- serv_links_ls[[recent_server]]
 ## CREATE DATAFRAME OF BASIC FIRE INFO  ----------------------------------------------
 
 # basic burn information
-burn_info <- read.csv(paste(results_output_link, "/output/data/fire_locations.csv", sep = "")) %>% 
+basic_burn_info <- read.csv(paste(results_output_link, "/output/data/fire_locations.csv", sep = "")) %>% 
   dplyr::select(lat = latitude,
          lon = longitude,
          utc_offset,
          date_time,
          acres = area) %>% 
   mutate(date = as_date(ymd(date_time)))
+
+# get ignition time
+ignition_info <- read.csv(paste(results_output_link, "/csvs/fire_emissions.csv", sep = "")) %>% 
+  select(date_time, flame_profile) %>% 
+  filter(flame_profile!= 0) %>%
+  slice(1) %>%
+  mutate(date_time = as_datetime(date_time) + as.numeric(str_sub(basic_burn_info$utc_offset, start = 1, end=3))*3600) %>% 
+  arrange(date_time) %>% 
+  slice(1) %>%
+  mutate(igntition_time = ifelse(hour(date_time) <=9, 
+                                 as.character(str_pad(hour(date_time), width = 4, side = "both", pad = 0)),
+                                 as.character(str_pad(hour(date_time), width = 4, side = "right", pad = 0))))
+  
+# burn info combined
+burn_info <- basic_burn_info %>% 
+  add_column(ignition_time = ignition_info$igntition_time)
 
 # create sf object of burn location
 burn_loc <- burn_info %>% 
@@ -754,14 +770,129 @@ pop_pal_fun <- colorFactor(palette = "magma",
 #                     na.color = "transparent")
 
 # generate leaflet map for average smoke
+# avg_leaflet <- leaflet() %>% 
+#   addTiles() %>% 
+#   
+#   addProviderTiles("OpenStreetMap",
+#                    group = "Street") %>%
+#   addProviderTiles("Esri.WorldImagery",
+#                     group = "Terrain") %>%
+#   
+#   
+#   # add mappanes to always keep circles, then smoke on top
+#   addMapPane("pop_map", zIndex = 410) %>%
+#   # addMapPane("svi_map", zIndex = 410) %>%
+#   addMapPane("smoke_map", zIndex = 420) %>%
+#   addMapPane("cir_map", zIndex = 430) %>%
+# 
+#   #daily average smoke conditions
+#   addRasterImage(day_one_avg_ras,
+#                 colors = avg_pal_fun,
+#                 opacity = 0.75,
+#                 group = "Smoke",
+#            options=gridOptions(pane="smoke_map")) %>%
+#   addLegend(pal = avg_pal_fun,
+#            values = levels(day_one_avg_ras)[[1]][1]$ID,
+#            labFormat  = labelFormat(
+#              transform = function(x) {
+#              levels(day_one_avg_ras)[[1]]$pm[which(levels(day_one_avg_ras)[[1]]$ID == x)]}),
+#             opacity = 0.75,
+#            title = "PM2.5 (ug m^-3)",
+#            group = "Smoke") %>%
+# 
+#   # fire location
+#  addMarkers(data = burn_loc, lng = ~lon, lat = ~lat,
+#              icon = list(
+#                iconUrl = "redFlame.png",
+#                iconSize = c(25, 35))) %>%
+# 
+#   # circular buffers around fire
+#   addCircles(data = burn_loc, lng = ~lon, lat = ~lat,
+#              radius = c(402.336, 804.672, 1609.34, 3218.69, 8046.72, 16093.4, 32186.8),
+#              color = viridis::viridis(7),
+#              weight = 5,
+#              opacity = 0.8, 
+#              fill = FALSE,
+#              group = "Distance from Fire",
+#            options=gridOptions(pane="cir_map")) %>% 
+#   
+#   addLegend(values = c(402.336, 804.672, 1609.34, 3218.69, 8046.72, 16093.4, 32186.8),
+#            colors = viridis::viridis(7),
+#            labels = c(0.25, 0.5, 1, 2, 5, 10, 20),
+#             opacity = 0.75,
+#            position = "bottomleft",
+#            title = "Distance from Fire (miles)",
+#            group = "Distance from Fire") %>% 
+# 
+#   # SVI data
+#   # addRasterImage(svi_buf,
+#   #                colors = svi_pal_fun,
+#   #                opacity = 0.75,
+#   #                group = "Social Vulnerability Index",
+#   #                options= gridOptions(pane="svi_map")) %>%
+#   # addLegend(pal = svi_pal_fun,
+#   #           opacity = 0.75,
+#   #           values = seq(0,1,0.1),
+#   #           group = "Social Vulnerability Index",
+#   #           position = "bottomleft",
+#   #           labels = seq(0,1,0.1),
+#   #           title = "Social Vulnerability Index") %>%
+# 
+#   # Pop data
+#   addRasterImage(pop_buf,
+#                  colors = pop_pal_fun,
+#                  opacity = 0.75,
+#                  group = "Population",
+#                  options= gridOptions(pane="pop_map")) %>%
+#   addLegend(pal = pop_pal_fun,
+#            values = levels(pop_buf)[[1]][1]$ID,
+#            labFormat  = labelFormat(
+#              transform = function(x) {
+#              levels(pop_buf)[[1]]$val[which(levels(pop_buf)[[1]]$ID == x)]}),
+#             opacity = 0.75,
+#            position = "bottomleft",
+#            title = "Population",
+#            group = "Population") %>%
+# 
+#   # set scale of map viewer
+#   fitBounds(lng1 = burn_icon$x - 0.5,
+#             lat1 = burn_icon$y - 0.5,
+#             lng2 = burn_icon$x + 0.5,
+#             lat2 = burn_icon$y + 0.5) %>%
+# 
+#   # scale bar
+#   addScaleBar(position = "bottomright") %>% 
+#   
+#   # basemap toggle
+#   addLayersControl(baseGroups = c("Street", "Terrain"),
+#                    position = "topright") %>%
+# 
+#   # add layer control to map
+#   addLayersControl(
+#     # overlayGroups = c("Smoke", "Population", "Social Vulnerability Index"),
+#     overlayGroups = c("Smoke", "Distance from Fire", "Population"),
+#     options = layersControlOptions(collapsed = FALSE)) %>%
+#   hideGroup("Population") %>%
+#   hideGroup("Distance from Fire")
+# # hideGroup("Social Vulnerability Index")
+
+
 avg_leaflet <- leaflet() %>% 
-  addTiles() %>%
+  addTiles() %>% 
   
-  # add mappanes to always keep circles, then smoke on top
-  addMapPane("pop_map", zIndex = 410) %>% 
-  # addMapPane("svi_map", zIndex = 410) %>% 
-  addMapPane("smoke_map", zIndex = 420) %>% 
-  addMapPane("cir_map", zIndex = 430) %>% 
+  addProviderTiles("OpenStreetMap",
+                   group = "Street") %>% 
+                   # options  = providerTileOptions(zIndex = 300)) %>%
+  addProviderTiles("Esri.WorldImagery",
+                    group = "Terrain") %>% 
+                   # options  = providerTileOptions(zIndex = 300)) %>%
+  
+  
+  # # add mappanes to always keep circles, then smoke on top
+  addMapPane("pop_map", zIndex = 450) %>%
+  # # addMapPane("svi_map", zIndex = 410) %>%
+  addMapPane("smoke_map", zIndex = 460) %>%
+  addMapPane("cir_map", zIndex = 470) %>%
   
   #daily average smoke conditions
   addRasterImage(day_one_avg_ras,
@@ -782,25 +913,25 @@ avg_leaflet <- leaflet() %>%
  addMarkers(data = burn_loc, lng = ~lon, lat = ~lat,
              icon = list(
                iconUrl = "redFlame.png",
-               iconSize = c(25, 35))) %>% 
-  
-  # circular buffers around fire
+               iconSize = c(25, 35))) %>%
+
+ #  # circular buffers around fire
   addCircles(data = burn_loc, lng = ~lon, lat = ~lat,
              radius = c(402.336, 804.672, 1609.34, 3218.69, 8046.72, 16093.4, 32186.8),
              color = viridis::viridis(7),
              weight = 5,
-             opacity = 0.8, 
+             opacity = 0.8,
              fill = FALSE,
              group = "Distance from Fire",
-           options=gridOptions(pane="cir_map")) %>% 
-  
+           options=gridOptions(pane="cir_map")) %>%
+
   addLegend(values = c(402.336, 804.672, 1609.34, 3218.69, 8046.72, 16093.4, 32186.8),
            colors = viridis::viridis(7),
            labels = c(0.25, 0.5, 1, 2, 5, 10, 20),
             opacity = 0.75,
            position = "bottomleft",
            title = "Distance from Fire (miles)",
-           group = "Distance from Fire") %>% 
+           group = "Distance from Fire") %>%
 
   # SVI data
   # addRasterImage(svi_buf,
@@ -816,7 +947,7 @@ avg_leaflet <- leaflet() %>%
   #           labels = seq(0,1,0.1),
   #           title = "Social Vulnerability Index") %>%
 
-  # Pop data
+  # # Pop data
   addRasterImage(pop_buf,
                  colors = pop_pal_fun,
                  opacity = 0.75,
@@ -830,7 +961,7 @@ avg_leaflet <- leaflet() %>%
             opacity = 0.75,
            position = "bottomleft",
            title = "Population",
-           group = "Population") %>% 
+           group = "Population") %>%
 
   # set scale of map viewer
   fitBounds(lng1 = burn_icon$x - 0.5,
@@ -841,15 +972,19 @@ avg_leaflet <- leaflet() %>%
   # scale bar
   addScaleBar(position = "bottomright") %>% 
   
+
   # add layer control to map
   addLayersControl(
     # overlayGroups = c("Smoke", "Population", "Social Vulnerability Index"),
     overlayGroups = c("Smoke", "Distance from Fire", "Population"),
-    options = layersControlOptions(collapsed = FALSE)) %>% 
-  hideGroup("Population") %>% 
+    baseGroups = c("Street", "Terrain"),
+    options = layersControlOptions(zIndex = 490,
+                                   collapsed = FALSE)) %>%
+  hideGroup("Population") %>%
   hideGroup("Distance from Fire") 
-  # hideGroup("Social Vulnerability Index") 
-
+# hideGroup("Social Vulnerability Index")
+  
+  
 
 
 
