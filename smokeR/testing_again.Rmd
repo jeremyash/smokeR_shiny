@@ -118,20 +118,20 @@ basic_burn_info <- read.csv(paste(results_output_link, "/output/data/fire_locati
          lon = longitude,
          utc_offset,
          date_time,
-         acres = area) %>% 
-  mutate(date = as_date(ymd(date_time)))
+         acres = area,
+         total_consumption) %>% 
+  mutate(date = as_date(ymd(date_time)),
+         consumption_acre = total_consumption/acres)
 
 # get ignition time
-ignition_info <- read.csv(paste(results_output_link, "/csvs/fire_emissions.csv", sep = "")) %>% 
+timing_info <- read.csv(paste(results_output_link, "/csvs/fire_emissions.csv", sep = "")) %>% 
   select(date_time, flame_profile) %>% 
   filter(flame_profile!= 0) %>%
-  slice(1) %>%
   mutate(date_time = as_datetime(date_time) + as.numeric(str_sub(basic_burn_info$utc_offset, start = 1, end=3))*3600) %>% 
   arrange(date_time) %>% 
-  slice(1) %>%
-  mutate(igntition_time = ifelse(hour(date_time) <=9, 
-                                 as.character(str_pad(hour(date_time), width = 4, side = "both", pad = 0)),
-                                 as.character(str_pad(hour(date_time), width = 4, side = "right", pad = 0))))
+  mutate(date_time = str_sub(date_time, start = 6)) %>% 
+  summarise(flaming_start = min(date_time),
+         flaming_end = max(date_time))
   
 # burn info combined
 burn_info <- basic_burn_info %>% 
