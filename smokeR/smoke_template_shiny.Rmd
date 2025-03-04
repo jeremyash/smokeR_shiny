@@ -366,7 +366,7 @@ superfog_sen <- ifelse(burn_info$region == "08",
 
 
 
-This report documents the recent air quality, smoke analysis and weather forecast for the `r params$BURN_NAME` prescribed fire on the `r params$FOREST`, planned for `r burn_info$date`. Additional smoke modeling output can be found at the [BlueSky Playground Dispersion Results](`r bsky_link`). For more information: `r contact_info`.
+This report documents the recent air quality, smoke analysis and weather forecast for the `r params$BURN_NAME` prescribed fire on the `r params$FOREST`, planned for `r burn_info$date` (`r burn_info$acres` acres with an ignition time of `r burn_info$ignition_time`). Additional smoke modeling output can be found at the [BlueSky Playground Dispersion Results](`r bsky_link`). For more information: `r contact_info`.
 
 
 ## Recent Air Quality in Area 
