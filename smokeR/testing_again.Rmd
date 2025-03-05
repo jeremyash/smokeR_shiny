@@ -119,9 +119,9 @@ basic_burn_info <- read.csv(paste(results_output_link, "/output/data/fire_locati
          utc_offset,
          date_time,
          acres = area,
-         total_consumption) %>% 
+         consumption_total) %>% 
   mutate(date = as_date(ymd(date_time)),
-         consumption_acre = total_consumption/acres)
+         consumption_acre = consumption_total/acres)
 
 # get ignition time
 timing_info <- read.csv(paste(results_output_link, "/csvs/fire_emissions.csv", sep = "")) %>% 
@@ -135,7 +135,8 @@ timing_info <- read.csv(paste(results_output_link, "/csvs/fire_emissions.csv", s
   
 # burn info combined
 burn_info <- basic_burn_info %>% 
-  add_column(ignition_time = ignition_info$igntition_time)
+  add_column(flaming_start = timing_info$flaming_start,
+             flaming_end = timing_info$flaming_end)
 
 # create sf object of burn location
 burn_loc <- burn_info %>% 
@@ -154,6 +155,26 @@ burn_region <- as.character(regions$REGION[st_intersects(burn_loc_sf, regions_sf
 # update burn info with region
 burn_info <- burn_info %>% 
   mutate(region = burn_region)
+
+# lat_long value
+lat_lon <- paste(burn_info$lat, burn_info$lon, sep = ", ")
+
+# table values
+tbf_vals <- burn_info %>% 
+  mutate(date = as.character(date)) %>% 
+  mutate(consumption_acre = round(consumption_acre, 2)) %>% 
+  add_column("lat_lon", lat_lon) %>% 
+  select(date, lat_lon, acres, flaming_start, flaming_end, consumption_acre) %>% 
+  gather("var", "val")
+
+# generate kable of basic burn information
+burn_kable <- tibble(vars = c("Date", "Coordinates", "Acreage", "Flaming Start", "Flaming End", "Consumption (tons/acre)"),
+                     vals = tbf_vals$val) %>%
+  kbl(col.names = NULL) %>% 
+  kable_styling() %>%
+  # kable(escape = FALSE, linesep = "", format = "html") %>% 
+  column_spec(1, bold = T)
+  
 
 
 ## GENERTE DATA FOR RECENT AIR QUALITY ----------------------------------------------
@@ -363,10 +384,19 @@ superfog_sen <- ifelse(burn_info$region == "08",
 
 ```
 
-
-
+<br>
+<div class="fire_info_wrapper">
+  <div>
+  <p>
 This report documents the recent air quality, smoke analysis and weather forecast for the `r params$BURN_NAME` prescribed fire on the `r params$FOREST`, planned for `r burn_info$date`. Additional smoke modeling output can be found at the [BlueSky Playground Dispersion Results](`r bsky_link`). For more information: `r contact_info`.
-
+  </p>
+  </div>
+  <div>
+```{r fire_info_tbl, fig.height = 6, fig.width = 6, echo = FALSE, warning = FALSE}
+burn_kable
+```
+  </div>
+</div>
 
 ## Recent Air Quality in Area 
 
