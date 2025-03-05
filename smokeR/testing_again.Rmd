@@ -1,5 +1,6 @@
 ---
-title: "Smoke Outlook for `r params$BURN_NAME` Prescribed Fire, `r params$FOREST`"
+title: "Smoke Outlook for <br> `r params$BURN_NAME` Prescribed Fire"
+subtitle: "`r params$FOREST`"
 # date: "Issued at `r Sys.time()`"
 output:
   html_document: 
@@ -9,11 +10,11 @@ output:
     css: report_styles.css
 geometry: margin=0.25in
 params: 
-  BURN_NAME: "Test"
-  FOREST: "Test"
-  AUTHOR: "Test"
-  EMAIL: "Test"
-  PHONE: "Test"
+  BURN_NAME: "Hidden Valley"
+  FOREST: "George Washington and Jefferson National Forest"
+  AUTHOR: "Jeremy Ash"
+  EMAIL: "jeremy.ash@usda.gov"
+  PHONE: "828-244-4741"
   RUN_ID: "167c62c71d91b9"
   DROP_LOW_AVG: "No"
   FORECAST_AQI_SELECT: "Good"
@@ -171,7 +172,7 @@ tbf_vals <- burn_info %>%
 burn_kable <- tibble(vars = c("Date", "Coordinates", "Acreage", "Flaming Start", "Flaming End", "Consumption (tons/acre)"),
                      vals = tbf_vals$val) %>%
   kbl(col.names = NULL) %>% 
-  kable_styling() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
   # kable(escape = FALSE, linesep = "", format = "html") %>% 
   column_spec(1, bold = T)
   
@@ -387,9 +388,11 @@ superfog_sen <- ifelse(burn_info$region == "08",
 <br>
 <div class="fire_info_wrapper">
   <div>
-  <p>
-This report documents the recent air quality, smoke analysis and weather forecast for the `r params$BURN_NAME` prescribed fire on the `r params$FOREST`, planned for `r burn_info$date`. Additional smoke modeling output can be found at the [BlueSky Playground Dispersion Results](`r bsky_link`). For more information: `r contact_info`.
+  <p class="paragraph">
+This report documents the recent air quality, smoke analysis and weather forecast for the `r params$BURN_NAME` prescribed fire on the `r params$FOREST`. <br><br> Additional smoke modeling output can be found at the [BlueSky Playground Dispersion Results](`r bsky_link`). <br><br> **For more information:** <br>`r contact_info`
   </p>
+  </div>
+  <div>
   </div>
   <div>
 ```{r fire_info_tbl, fig.height = 6, fig.width = 6, echo = FALSE, warning = FALSE}
