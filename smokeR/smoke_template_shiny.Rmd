@@ -995,7 +995,7 @@ The predicted weather data for this area, including fire behavior and smoke para
 
 
 ## Data Sources
-AQI: EPA data accessed via https://github.com/MazamaScience/PWFSLSmoke
+AQI: EPA data accessed via https://cran.r-project.org/web/packages/AirMonitor/index.html
 
 BlueSky Playground v3.5: https://portal.airfire.org/ 
 
