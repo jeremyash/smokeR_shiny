@@ -393,6 +393,7 @@ This report documents the recent air quality, smoke analysis and weather forecas
   <div>
   </div>
   <div>
+  
 ```{r fire_info_tbl, fig.height = 6, fig.width = 6, echo = FALSE, warning = FALSE}
 burn_kable
 ```
@@ -420,7 +421,7 @@ burn_icon <- tibble(x = burn_info$lon,
 # <img src='https://fire.airnow.gov/07939407ecc29c4bde560ae7071031d4.png'style='width:15px;height:15px;'>Temporary&nbsp;monitor<br/>"
 # 
 
-html_legend <- "<img src='https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true'style='width:15px;height:20px;'>&nbsp;Burn&nbsp;location<br/>
+html_legend <- "<img src='https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true'style='width:13px;height:13px;'>&nbsp;Burn&nbsp;location<br/>
 <img src='https://github.com/jeremyash/icons/blob/main/perm_mon.png?raw=true'style='width:13px;height:13px;'>&nbsp;Permanent&nbsp;monitor<br/>
 <img src='https://github.com/jeremyash/icons/blob/main/temp_mon.png?raw=true'style='width:13px;height:13px;'>&nbsp;Temporary&nbsp;monitor<br/>"
 
