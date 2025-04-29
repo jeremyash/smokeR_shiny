@@ -1,20 +1,3 @@
-######################################################################
-#
-#  Wilderness Stewardship Performance:
-#      Shiny app for automagically generated WSP reports
-#
-#    Rob Smith, robertsmith3@usda.gov, 18 Dec 2020
-#
-##      GNU General Public License, Version 3.0    ###################
-
-# This project was supported in part by an appointment to the Research
-# Participation Program at the United States Forest Service, United
-# States Department of Agriculture, administered by the Oak Ridge
-# Institute for Science and Education through an interagency agreement
-# between the U.S. Department of Energy and USFS.
-
-# FOR RASTER OPTIONS IN LEAFLET, run this if leaflet is updated: remotes::install_github("rstudio/leaflet", ref="joe/feature/raster-options")
-
 require(shiny)
 require(tidyverse)
 require(rmarkdown)
@@ -33,8 +16,8 @@ nfs <-readRDS('usfs_unit_list.RDS')
 
 ###################################################################
 ui <- fluidPage(
-  title = 'Prescribed Fire Smoke Outlook',
-  titlePanel('Prescribed Fire Smoke Outlook'),
+  title = 'Prescribed Fire Smoke Report',
+  titlePanel('Prescribed Fire Smoke Report'),
   br(),br(),
   sidebarLayout(
     ### sidebar
@@ -60,7 +43,7 @@ ui <- fluidPage(
         textInput("EMAIL", "Your email (optional)"),
         textInput("PHONE", "Your phone number (optional)"),
         radioButtons("DROP_LOW_AVG", "Drop lowest PM category (1-9 ug m-3) from the map?", c("Yes", "No")),
-     downloadButton("report", "Download Smoke Outlook"),
+     downloadButton("report", "Download Smoke Report"),
      downloadButton("kmz", "Download Google Earth File")
     ),
     ### main panel
@@ -166,7 +149,7 @@ server <- function(input, output) {
   ### download handler for report
   output$report <- downloadHandler(
     # set up file names for downloads
-    filename = "smoke_outlook.html",
+    filename = "smoke_report.html",
     content = function(file) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir (which
