@@ -421,7 +421,7 @@ burn_icon <- tibble(x = burn_info$lon,
 # <img src='https://fire.airnow.gov/07939407ecc29c4bde560ae7071031d4.png'style='width:15px;height:15px;'>Temporary&nbsp;monitor<br/>"
 # 
 
-html_legend <- "<img src='https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true'style='width:18px;height:15px;'>&nbsp;Burn&nbsp;location<br/>
+html_legend <- "<img src='https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true'style='width:13px;height:15px;'>&nbsp;Burn&nbsp;location<br/>
 <img src='https://github.com/jeremyash/icons/blob/main/perm_mon.png?raw=true'style='width:13px;height:13px;'>&nbsp;Permanent&nbsp;monitor<br/>
 <img src='https://github.com/jeremyash/icons/blob/main/temp_mon.png?raw=true'style='width:13px;height:13px;'>&nbsp;Temporary&nbsp;monitor<br/>"
 
@@ -457,7 +457,7 @@ air_mon_leaflet <-
              icon = list(
                iconUrl = "https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true",
               # iconUrl = "redFlame.png",
-              iconSize = c(35, 28))) %>% 
+               iconSize = c(23, 28))) %>% 
 
   
   # icon legend
@@ -829,7 +829,7 @@ avg_leaflet <- leaflet() %>%
  addMarkers(data = burn_loc, lng = ~lon, lat = ~lat,
              icon = list(
                iconUrl = "https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true",
-              iconSize = c(35, 28))) %>% 
+               iconSize = c(23, 28))) %>% 
 
   # circular buffers around fire
   addCircles(data = burn_loc, lng = ~lon, lat = ~lat,
@@ -924,7 +924,7 @@ vis_leaflet <- leaflet() %>%
   addMarkers(data = burn_loc, lng = ~lon, lat = ~lat,
              icon = list(
                iconUrl = "https://github.com/jeremyash/icons/blob/main/redFlame.png?raw=true",
-               iconSize = c(35, 28))) %>% 
+                iconSize = c(23, 28))) %>% 
   
   fitBounds(lng1 = burn_icon$x - 0.5,
             lat1 = burn_icon$y - 0.5,
