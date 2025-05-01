@@ -571,7 +571,7 @@ For more smoke and health information: [https://airnow.gov/](https://airnow.gov/
 
 
 ## Modeled Smoke Dispersion
-Below are the smoke modeling outputs for the day of the planned burn. The maps below show the __daily average concentrations__ (top panel) and __daily average visual range__ (bottom panel) for `r burn_info$date`. Zoom in/out on each of the interactive maps to view particular features.
+Below are the smoke modeling outputs for the day of the planned burn. The maps below show the __daily average concentrations__ (top panel) and __maximum hourly impact to visual range__ (bottom panel) for `r burn_info$date`. Zoom in/out on each of the interactive maps to view particular features.
 
 
 ```{r leaflet_map_data_mgt, include = FALSE, echo = FALSE, message = FALSE, warning = FALSE}
